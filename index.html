@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>For Liendsay ❤️</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #050005;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      touch-action: none;
+    }
+
+    /* OVERLAY BUTTON PARA SA AUDIO UNLOCK */
+    #start-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #050005;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .start-btn {
+      background: linear-gradient(135deg, #ff0055, #ff2a5f);
+      color: white;
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 16px 36px;
+      border-radius: 30px;
+      border: none;
+      box-shadow: 0 0 25px rgba(255, 42, 95, 0.7);
+      animation: pulseBtn 1.5s infinite;
+      cursor: pointer;
+    }
+
+    @keyframes pulseBtn {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    #lock-stage {
+      position: absolute;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      text-align: center;
+      background: rgba(15, 5, 20, 0.95);
+      padding: 25px;
+      border-radius: 20px;
+      border: 1px solid #ff2a5f44;
+      box-shadow: 0 0 20px rgba(255, 42, 95, 0.25);
+    }
+
+    .compass-wrapper {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .top-needle {
+      position: absolute;
+      top: -12px;
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 18px solid #ff0055;
+      z-index: 20;
+    }
+
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .ring-outer { width: 280px; height: 280px; border: 2px solid #ff2a5f; }
+    .ring-middle { width: 200px; height: 200px; border: 2px solid #ff7597; }
+    .ring-inner { width: 120px; height: 120px; border: 2px solid #ffa3b8; }
+
+    .dial-item {
+      position: absolute;
+      font-weight: bold;
+      user-select: none;
+      pointer-events: none;
+      text-align: center;
+      transform-origin: center center;
+    }
+
+    .center-core {
+      width: 45px;
+      height: 45px;
+      background: radial-gradient(circle, #ff0055, #330011);
+      border-radius: 50%;
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+      z-index: 5;
+    }
+
+    .status-text {
+      font-size: 16px;
+      color: #ff7597;
+      margin-top: 5px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #matrix-canvas { z-index: 1; }
+    #main-canvas { z-index: 2; }
+
+    /* NORMAL COUNTDOWN */
+    #countdown-display {
+      position: absolute;
+      z-index: 20;
+      font-size: 100px;
+      font-weight: bold;
+      color: #ff0055;
+      text-shadow: 0 0 30px #ff0055;
+      display: none;
+    }
+
+    /* QUESTIONNAIRE OVERLAY STYLES */
+    .quiz-overlay {
+      position: absolute;
+      z-index: 40;
+      background: rgba(15, 0, 10, 0.92);
+      border: 2px solid #ff0055;
+      padding: 25px 30px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(255, 0, 85, 0.6);
+      max-width: 90vw;
+      width: 350px;
+      display: none;
+    }
+
+    .quiz-title {
+      font-size: 17px;
+      color: #ff7597;
+      margin-bottom: 18px;
+      font-weight: bold;
+      line-height: 1.4;
+    }
+
+    .quiz-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .quiz-btn {
+      padding: 10px 15px;
+      font-size: 14px;
+      font-weight: bold;
+      background: #ff0055;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255,0,85,0.4);
+      transition: 0.2s;
+    }
+
+    .quiz-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* FINAL STAGE */
+    #final-stage {
+      position: absolute;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      width: 100vw;
+      height: 100vh;
+      padding-bottom: 150px;
+      pointer-events: none;
+    }
+
+    #court-text-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 4px;
+      max-width: 95vw;
+      pointer-events: auto;
+      margin-bottom: 20px;
+    }
+
+    .draggable-letter {
+      font-size: 20px;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 0 0 10px #ff0055, 0 0 20px #ff0055;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .draggable-letter.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* QUESTION BOX */
+    #question-box {
+      position: absolute;
+      bottom: 40px;
+      background: rgba(20, 0, 10, 0.9);
+      border: 2px solid #ff0055;
+      padding: 15px 25px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 0 25px rgba(255, 0, 85, 0.5);
+      pointer-events: auto;
+      display: none;
+      z-index: 30;
+      max-width: 90vw;
+    }
+
+    #question-text {
+      font-size: 15px;
+      color: #ff7597;
+      margin-bottom: 12px;
+      font-weight: bold;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    .q-btn {
+      padding: 8px 20px;
+      font-size: 14px;
+      font-weight: bold;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    #yes-btn {
+      background-color: #ff0055;
+      color: white;
+      box-shadow: 0 0 10px #ff0055;
+    }
+
+    #no-btn {
+      background-color: #555;
+      color: white;
+      position: relative;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- TAP TO START OVERLAY -->
+  <div id="start-overlay" onclick="startSurprise()">
+    <button class="start-btn">TAP TO OPEN SURPRISE ❤</button>
+  </div>
+
+  <!-- LOCAL DOWNLOADED MUSIC FILE -->
+  <audio id="bgMusic" loop preload="auto">
+    <source src="music.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- COMPASS LOCK -->
+  <div id="lock-stage" class="hidden">
+    <h3 style="color: #ff2a5f; font-size: 17px;">Rotate Rings to Target Date</h3>
+    <div class="compass-wrapper" id="compassContainer">
+      <div class="top-needle"></div>
+      <div class="ring ring-outer" id="ringOuter"></div>
+      <div class="ring ring-middle" id="ringMiddle"></div>
+      <div class="ring ring-inner" id="ringInner"></div>
+      <div class="center-core">♥</div>
+    </div>
+    <div class="status-text" id="statusText">JAN - 01 - 2000</div>
+  </div>
+
+  <!-- FIRST QUIZ BOX -->
+  <div id="quiz-box-1" class="quiz-overlay">
+    <div class="quiz-title" id="q1-text">1. How are you right now?</div>
+    <div class="quiz-btn-group" id="q1-buttons">
+      <button class="quiz-btn" onclick="answerQ1(1)">Okay lang busengg</button>
+      <button class="quiz-btn" onclick="answerQ1(2)">Pagod busengg</button>
+    </div>
+  </div>
+
+  <!-- NORMAL COUNTDOWN -->
+  <div id="countdown-display">3</div>
+
+  <!-- SECOND QUIZ BOX -->
+  <div id="quiz-box-2" class="quiz-overlay">
+    <div class="quiz-title" id="q2-text">1. Are you ready to see what i made for you?</div>
+    <div class="quiz-btn-group" id="q2-buttons">
+      <button class="quiz-btn" onclick="answerQ2(1)">Para saan ba 'yan busengg?'</button>
+      <button class="quiz-btn" onclick="answerQ2(2)">Hindi busengg ih</button>
+    </div>
+  </div>
+
+  <!-- FINAL STAGE -->
+  <div id="final-stage" class="hidden">
+    <div id="court-text-container"></div>
+  </div>
+
+  <!-- QUESTION BOX -->
+  <div id="question-box">
+    <div id="question-text">May I court you ba, Liendsay?</div>
+    <div class="btn-group">
+      <button class="q-btn" id="yes-btn" onclick="sayYes()">Yes, (Kiss mo ako kung oo)</button>
+      <button class="q-btn" id="no-btn" onmouseover="moveNo()" ontouchstart="moveNo()">Ayoko</button>
+    </div>
+  </div>
+
+  <canvas id="matrix-canvas"></canvas>
+  <canvas id="main-canvas"></canvas>
+
+  <script>
+    const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+    const days = Array.from({length: 31}, (_, i) => String(i + 1).padStart(2, '0'));
+    const years = ["2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010"];
+
+    const ringOuter = document.getElementById('ringOuter');
+    const ringMiddle = document.getElementById('ringMiddle');
+    const ringInner = document.getElementById('ringInner');
+    const compass = document.getElementById('compassContainer');
+    const statusText = document.getElementById('statusText');
+
+    let outerElements = [], middleElements = [], innerElements = [];
+
+    function buildDial(ring, items, color, fontSize) {
+      const elements = [];
+      items.forEach((item) => {
+        const el = document.createElement('div');
+        el.className = 'dial-item';
+        el.style.color = color;
+        el.style.fontSize = fontSize;
+        el.innerText = item;
+        ring.appendChild(el);
+        elements.push(el);
+      });
+      return elements;
+    }
+
+    outerElements = buildDial(ringOuter, months, "#ff2a5f", "12px");
+    middleElements = buildDial(ringMiddle, days, "#ff7597", "10px");
+    innerElements = buildDial(ringInner, years, "#ffa3b8", "10px");
+
+    let outerAngle = 0, middleAngle = 0, innerAngle = 0;
+
+    function renderDial(elements, radius, currentAngle) {
+      const step = 360 / elements.length;
+      elements.forEach((el, i) => {
+        const itemAngle = (i * step + currentAngle - 90) % 360;
+        const rad = itemAngle * (Math.PI / 180);
+        el.style.transform = `translate(${radius * Math.cos(rad)}px, ${radius * Math.sin(rad)}px) rotate(${itemAngle + 90}deg)`;
+      });
+    }
+
+    function updateAllDials() {
+      renderDial(outerElements, 125, outerAngle);
+      renderDial(middleElements, 85, middleAngle);
+      renderDial(innerElements, 45, innerAngle);
+    }
+    updateAllDials();
+
+    function playAudio() {
+      const bgMusic = document.getElementById('bgMusic');
+      if (bgMusic) {
+        bgMusic.play().catch(err => console.log("Audio play error:", err));
+      }
+    }
+
+    function startSurprise() {
+      playAudio();
+      document.getElementById('start-overlay').classList.add('hidden');
+      document.getElementById('lock-stage').classList.remove('hidden');
+    }
+
+    let activeRing = null, lastMouseAngle = 0;
+    function getMouseAngle(x, y) {
+      const rect = compass.getBoundingClientRect();
+      return Math.atan2(y - (rect.top + rect.height/2), x - (rect.left + rect.width/2)) * (180 / Math.PI);
+    }
+
+    window.addEventListener('pointerdown', (e) => {
+      if (document.getElementById('lock-stage').classList.contains('hidden')) return;
+      const rect = compass.getBoundingClientRect();
+      const dist = Math.hypot(e.clientX - (rect.left + rect.width/2), e.clientY - (rect.top + rect.height/2));
+      if (dist >= 105 && dist <= 145) activeRing = 'outer';
+      else if (dist >= 65 && dist < 105) activeRing = 'middle';
+      else if (dist >= 20 && dist < 65) activeRing = 'inner';
+      if (activeRing) lastMouseAngle = getMouseAngle(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (!activeRing) return;
+      let delta = getMouseAngle(e.clientX, e.clientY) - lastMouseAngle;
+      if (delta > 180) delta -= 360; if (delta < -180) delta += 360;
+      if (activeRing === 'outer') outerAngle += delta;
+      else if (activeRing === 'middle') middleAngle += delta;
+      else if (activeRing === 'inner') innerAngle += delta;
+      lastMouseAngle = getMouseAngle(e.clientX, e.clientY);
+      updateAllDials();
+      checkCombination();
+    });
+
+    window.addEventListener('pointerup', () => activeRing = null);
+
+    function getSelectedValue(items, currentAngle) {
+      let norm = (-currentAngle) % 360; if (norm < 0) norm += 360;
+      return items[Math.round(norm / (360 / items.length)) % items.length];
+    }
+
+    function checkCombination() {
+      const selMonth = getSelectedValue(months, outerAngle);
+      const selDay = getSelectedValue(days, middleAngle);
+      const selYear = getSelectedValue(years, innerAngle);
+      statusText.innerText = `${selMonth} - ${selDay} - ${selYear}`;
+
+      if (selMonth === "MAR" && selDay === "01" && selYear === "2007") {
+        playAudio();
+        document.getElementById('lock-stage').classList.add('hidden');
+        startMatrixRain();
+        startFirstQuiz();
+      }
+    }
+
+    // MATRIX RAIN
+    const matrixCanvas = document.getElementById('matrix-canvas');
+    const mCtx = matrixCanvas.getContext('2d');
+    let mWidth = matrixCanvas.width = window.innerWidth, mHeight = matrixCanvas.height = window.innerHeight;
+    const chars = "10MAYICOURTYOU♥🦋", fontSize = 14, columns = Math.floor(mWidth / fontSize), drops = Array(columns).fill(1);
+
+    function startMatrixRain() {
+      function drawMatrix() {
+        mCtx.fillStyle = "rgba(5, 0, 5, 0.2)"; mCtx.fillRect(0, 0, mWidth, mHeight);
+        mCtx.fillStyle = "#ff0044"; mCtx.font = `${fontSize}px monospace`;
+        for (let i = 0; i < drops.length; i++) {
+          mCtx.fillText(chars[Math.floor(Math.random() * chars.length)], i * fontSize, drops[i] * fontSize);
+          if (drops[i] * fontSize > mHeight && Math.random() > 0.975) drops[i] = 0;
+          drops[i]++;
+        }
+        requestAnimationFrame(drawMatrix);
+      }
+      drawMatrix();
+    }
+
+    // FIRST QUIZ LOGIC
+    let quizStep1 = 1;
+    function startFirstQuiz() {
+      playAudio();
+      document.getElementById('quiz-box-1').style.display = 'block';
+    }
+
+    function answerQ1(choice) {
+      playAudio();
+      if (quizStep1 === 1) {
+        quizStep1 = 2;
+        document.getElementById('q1-text').innerText = "2. Today is my special day isn't it?";
+        document.getElementById('q1-buttons').innerHTML = `
+          <button class="quiz-btn" onclick="answerQ1(1)">Happy birthday, Klynne</button>
+          <button class="quiz-btn" onclick="answerQ1(2)">Birthday mo pala?</button>
+        `;
+      } else if (quizStep1 === 2) {
+        quizStep1 = 3;
+        document.getElementById('q1-text').innerText = "3. If ever I'll ask you that i will court you, What's your reaction?";
+        document.getElementById('q1-buttons').innerHTML = `
+          <button class="quiz-btn" onclick="answerQ1(1)">I don't know</button>
+          <button class="quiz-btn" onclick="answerQ1(2)">Ire-reject kita</button>
+        `;
+      } else {
+        document.getElementById('quiz-box-1').style.display = 'none';
+        startNormalCountdown();
+      }
+    }
+
+    function startNormalCountdown() {
+      playAudio();
+      const cdEl = document.getElementById('countdown-display');
+      cdEl.style.display = 'block'; let count = 3; cdEl.innerText = count;
+      const timer = setInterval(() => {
+        count--;
+        if (count > 0) cdEl.innerText = count;
+        else { 
+          clearInterval(timer); 
+          cdEl.style.display = 'none'; 
+          startInteractiveExperience();
+        }
+      }, 1000);
+    }
+
+    // 3D HEART + BACKGROUND PARTICLES
+    const mainCanvas = document.getElementById('main-canvas');
+    const ctx = mainCanvas.getContext('2d');
+    let width = mainCanvas.width = window.innerWidth, height = mainCanvas.height = window.innerHeight;
+
+    let heartAngleY = 0, heartAngleX = 0, userScale = 1.0;
+    const heartParticles = [], bgHearts = [];
+    let isHeartActive = false;
+
+    function initHeart3D() {
+      for (let t = 0; t < Math.PI * 2; t += 0.12) {
+        for (let phi = -Math.PI / 2; phi < Math.PI / 2; phi += 0.15) {
+          const x = 16 * Math.pow(Math.sin(t), 3);
+          const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+          heartParticles.push({ x: x * 10, y: y * 10, z: phi * 64 });
+        }
+      }
+      for(let i=0; i<30; i++) {
+        bgHearts.push({ x: Math.random() * width, y: Math.random() * height, size: Math.random() * 15 + 10, speed: Math.random() * 1.5 + 0.5 });
+      }
+    }
+
+    function startInteractiveExperience() {
+      playAudio();
+      initHeart3D();
+      isHeartActive = true;
+
+      let scaleIn = 0;
+      function drawScene() {
+        ctx.clearRect(0, 0, width, height);
+
+        ctx.fillStyle = "rgba(255, 0, 85, 0.3)";
+        bgHearts.forEach(h => {
+          ctx.font = `${h.size}px Arial`;
+          ctx.fillText("♥", h.x, h.y);
+          h.y -= h.speed;
+          if(h.y < -20) h.y = height + 20;
+        });
+
+        if (scaleIn < 1) scaleIn += 0.02;
+        heartAngleY += 0.012;
+        const cosY = Math.cos(heartAngleY), sinY = Math.sin(heartAngleY);
+        const cosX = Math.cos(heartAngleX), sinX = Math.sin(heartAngleX);
+
+        ctx.fillStyle = "#ff0055";
+        heartParticles.forEach((p) => {
+          let x1 = p.x * cosY - p.z * sinY, z1 = p.x * sinY + p.z * cosY;
+          let y1 = p.y * cosX - z1 * sinX, z2 = p.y * sinX + z1 * cosX;
+          if (z2 > 0) return;
+          const perspective = 350 / (350 + z2);
+          const projX = width / 2 + x1 * perspective * scaleIn * userScale;
+          const projY = (height / 2 - 80) + y1 * perspective * scaleIn * userScale;
+
+          ctx.beginPath();
+          ctx.arc(projX, projY, Math.max(1.5, 3 * perspective * userScale), 0, Math.PI * 2);
+          ctx.fill();
+        });
+        requestAnimationFrame(drawScene);
+      }
+      drawScene();
+
+      setTimeout(() => {
+        playAudio();
+        document.getElementById('quiz-box-2').style.display = 'block';
+      }, 10000);
+    }
+
+    // SECOND QUIZ LOGIC
+    let quizStep2 = 1;
+    function answerQ2(choice) {
+      playAudio();
+      if (quizStep2 === 1) {
+        quizStep2 = 2;
+        document.getElementById('q2-text').innerText = "2. Are you curious that would it be?";
+        document.getElementById('q2-buttons').innerHTML = `
+          <button class="quiz-btn" onclick="answerQ2(1)">Yes, I'm curious</button>
+          <button class="quiz-btn" onclick="answerQ2(2)">Not at all</button>
+        `;
+      } else {
+        document.getElementById('quiz-box-2').style.display = 'none';
+        startFinalEntrance();
+      }
+    }
+
+    function startFinalEntrance() {
+      playAudio();
+      document.getElementById('final-stage').classList.remove('hidden');
+      setupDraggableLetters();
+      setTimeout(() => { 
+        document.getElementById('question-box').style.display = 'block'; 
+      }, 3000);
+    }
+
+    function setupDraggableLetters() {
+      const container = document.getElementById('court-text-container');
+      "MAY I COURT YOU LIENDSAY".split('').forEach((char, i) => {
+        const span = document.createElement('span');
+        span.className = 'draggable-letter';
+        span.innerText = char === ' ' ? '\u00A0' : char;
+        container.appendChild(span);
+        
+        setTimeout(() => span.classList.add('show'), i * 150);
+
+        let isDragging = false, startX = 0, startY = 0;
+        span.addEventListener('pointerdown', (e) => { isDragging = true; startX = e.clientX; startY = e.clientY; span.setPointerCapture(e.pointerId); span.style.transition = 'none'; });
+        span.addEventListener('pointermove', (e) => { if (!isDragging) return; span.style.transform = `translate(${e.clientX - startX}px, ${e.clientY - startY}px) scale(1.3)`; });
+        span.addEventListener('pointerup', (e) => { if (!isDragging) return; isDragging = false; span.releasePointerCapture(e.pointerId); span.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'; span.style.transform = `translate(0px, 0px) scale(1)`; });
+      });
+    }
+
+    function moveNo() {
+      const btn = document.getElementById('no-btn');
+      const x = Math.random() * 160 - 80;
+      const y = Math.random() * 80 - 40;
+      btn.style.transform = `translate(${x}px, ${y}px)`;
+    }
+
+    function sayYes() {
+      playAudio();
+      document.getElementById('question-text').innerText = "Officially entering my manliligaw era.";
+      document.getElementById('no-btn').style.display = 'none';
+      document.getElementById('yes-btn').innerText = "Say (Kiss mo ako)";
+    }
+
+    let initialPinchDist = null, isHeartDragging = false, lastX = 0, lastY = 0;
+    window.addEventListener('touchstart', (e) => {
+      if (!isHeartActive || e.touches[0].clientY > height - 180) return;
+      if (e.touches.length === 2) initialPinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      else if (e.touches.length === 1) { isHeartDragging = true; lastX = e.touches[0].clientX; lastY = e.touches[0].clientY; }
+    });
+    window.addEventListener('touchmove', (e) => {
+      if (!isHeartActive) return;
+      if (e.touches.length === 2 && initialPinchDist) {
+        userScale = Math.min(Math.max(userScale * (Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY) / initialPinchDist), 0.4), 3.0);
+        initialPinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      } else if (e.touches.length === 1 && isHeartDragging) {
+        heartAngleY += (e.touches[0].clientX - lastX) * 0.01;
+        heartAngleX += (e.touches[0].clientY - lastY) * 0.01;
+        lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+      }
+    });
+    window.addEventListener('touchend', () => { initialPinchDist = null; isHeartDragging = false; });
+    window.addEventListener('resize', () => { width = mainCanvas.width = matrixCanvas.width = window.innerWidth; height = mainCanvas.height = matrixCanvas.height = window.innerHeight; });
+  </script>
+</body>
+</html>
